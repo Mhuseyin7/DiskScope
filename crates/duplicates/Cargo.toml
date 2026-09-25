@@ -1,0 +1,11 @@
+[package]
+name = "diskscope-duplicates"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+blake3.workspace = true
+sha2.workspace = true
+serde.workspace = true
+diskscope-common = { path = "../common" }

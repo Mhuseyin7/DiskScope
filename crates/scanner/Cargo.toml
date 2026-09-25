@@ -1,0 +1,10 @@
+[package]
+name = "diskscope-scanner"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+chrono.workspace = true
+diskscope-common = { path = "../common" }
+walkdir.workspace = true
