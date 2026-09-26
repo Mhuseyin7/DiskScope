@@ -676,9 +676,12 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "diskscope-analyzer",
+ "diskscope-cleanup",
  "diskscope-common",
+ "diskscope-duplicates",
  "diskscope-scanner",
  "serde",
+ "serde_json",
  "tauri",
  "tauri-build",
  "tauri-plugin-dialog",

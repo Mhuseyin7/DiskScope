@@ -11,7 +11,10 @@ tauri-build = { version = "2", features = [] }
 anyhow.workspace = true
 diskscope-analyzer = { path = "../../../crates/analyzer" }
 diskscope-common = { path = "../../../crates/common" }
+diskscope-cleanup = { path = "../../../crates/cleanup" }
+diskscope-duplicates = { path = "../../../crates/duplicates" }
 diskscope-scanner = { path = "../../../crates/scanner" }
 serde.workspace = true
+serde_json.workspace = true
 tauri = { version = "2", features = [] }
 tauri-plugin-dialog = "2"
