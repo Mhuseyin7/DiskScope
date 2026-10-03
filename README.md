@@ -67,6 +67,12 @@ DiskScope/
 
 ## Quick start
 
+### Installation
+
+Release packages are published on the [GitHub Releases page](https://github.com/Mhuseyin7/DiskScope/releases). Download the asset for your platform and verify its matching `checksums-*.txt` SHA-256 file before installation.
+
+Windows and macOS assets are currently unsigned; your operating system may show its standard publisher warning. Do not bypass a warning unless the downloaded asset matches the published SHA-256 checksum.
+
 ### Requirements
 
 - [Rust stable](https://www.rust-lang.org/tools/install)

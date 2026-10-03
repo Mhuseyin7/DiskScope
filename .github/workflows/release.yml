@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Package (${{ matrix.platform }})
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            checksum: windows
+          - platform: macos-latest
+            checksum: macos
+          - platform: ubuntu-22.04
+            checksum: linux
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "apps/desktop/src-tauri -> ../../../target"
+      - run: npm ci
+        working-directory: apps/desktop
+      - name: Build and publish platform package
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: apps/desktop
+          tagName: v__VERSION__
+          releaseName: "DiskScope v__VERSION__"
+          releaseBody: |
+            DiskScope v__VERSION__
+
+            Download the installer/package for your operating system. Every asset is built from this tag; SHA-256 checksums are attached as separate files.
+
+            Windows and macOS assets are currently unsigned. Verify the attached checksum before installation.
+          releaseDraft: false
+          prerelease: false
+      - name: Create SHA-256 checksum (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Get-ChildItem target/release/bundle -Recurse -File | ForEach-Object {
+            "$(Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName | Select-Object -ExpandProperty Hash)  $($_.Name)"
+          } | Set-Content -NoNewline checksums-${{ matrix.checksum }}.txt
+      - name: Create SHA-256 checksum (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: find target/release/bundle -type f -print0 | xargs -0 shasum -a 256 > checksums-${{ matrix.checksum }}.txt
+      - name: Attach checksum
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: checksums-${{ matrix.checksum }}.txt
